@@ -2,8 +2,8 @@
 Rings Network Transport Implementations
 ========================================
 
-*Note: This core transport layer was originally designed by the Rings Network 
-(asi-build) team (https://github.com/RingsNetwork/asi-build) and has been 
+*Note: This core transport layer was originally designed by the Rings Network
+(asi-build) team (https://github.com/RingsNetwork/asi-build) and has been
 forked and adapted for the Red-Pill ecosystem.*
 
 Production transports for connecting a :class:`~.client.RingsClient` to real
@@ -271,11 +271,7 @@ class WebSocketTransport:
 					future = self._pending.pop(msg_id)
 					if not future.done():
 						if "error" in msg:
-							future.set_exception(
-								RuntimeError(
-									f"RPC error: {msg['error'].get('message', msg['error'])}"
-								)
-							)
+							future.set_exception(RuntimeError(f"RPC error: {msg['error'].get('message', msg['error'])}"))
 						else:
 							future.set_result(msg.get("result"))
 				else:
@@ -306,10 +302,7 @@ class WebSocketTransport:
 
 		while not self._shutting_down:
 			self._reconnect_attempts += 1
-			if (
-				self._max_reconnect_attempts > 0
-				and self._reconnect_attempts > self._max_reconnect_attempts
-			):
+			if self._max_reconnect_attempts > 0 and self._reconnect_attempts > self._max_reconnect_attempts:
 				logger.error(
 					"Max reconnection attempts (%d) reached",
 					self._max_reconnect_attempts,
@@ -441,9 +434,7 @@ class HTTPTransport:
 				if "error" in body:
 					self._stats["errors"] += 1
 					err = body["error"]
-					raise RuntimeError(
-						f"RPC error: {err.get('message', err)}"
-					)
+					raise RuntimeError(f"RPC error: {err.get('message', err)}")
 				return body.get("result")
 		except RuntimeError:
 			raise
@@ -571,9 +562,7 @@ class MultiNodeTransport:
 					)
 			tried += 1
 
-		raise ConnectionError(
-			f"All {n} nodes failed. Last error: {last_exc}"
-		)
+		raise ConnectionError(f"All {n} nodes failed. Last error: {last_exc}")
 
 	# ── Public helpers ────────────────────────────────────────────────────
 
@@ -596,10 +585,7 @@ class MultiNodeTransport:
 		return list(self._transports)
 
 	def __repr__(self) -> str:
-		return (
-			f"MultiNodeTransport(nodes={len(self._urls)}, "
-			f"connected={self.connected_count})"
-		)
+		return f"MultiNodeTransport(nodes={len(self._urls)}, connected={self.connected_count})"
 
 
 # ---------------------------------------------------------------------------
@@ -607,9 +593,7 @@ class MultiNodeTransport:
 # ---------------------------------------------------------------------------
 
 
-def _make_single_transport(
-	url: str, transport_type: str = "", **kwargs: Any
-) -> WebSocketTransport | HTTPTransport:
+def _make_single_transport(url: str, transport_type: str = "", **kwargs: Any) -> WebSocketTransport | HTTPTransport:
 	"""Create a single transport from a URL, auto-detecting scheme."""
 	if transport_type == "http" or url.startswith("http://") or url.startswith("https://"):
 		return HTTPTransport(url, **{k: v for k, v in kwargs.items() if k == "request_timeout"})
@@ -617,9 +601,7 @@ def _make_single_transport(
 	return WebSocketTransport(url, **kwargs)
 
 
-def create_transport(
-	url: str, **kwargs: Any
-) -> WebSocketTransport | HTTPTransport | MultiNodeTransport | Any:
+def create_transport(url: str, **kwargs: Any) -> WebSocketTransport | HTTPTransport | MultiNodeTransport | Any:
 	"""Factory: build the appropriate transport from a connection string.
 
 	Schemes
@@ -628,8 +610,6 @@ def create_transport(
 		→ :class:`WebSocketTransport`
 	``http://``, ``https://``
 		→ :class:`HTTPTransport`
-	``memory://``
-		→ :class:`~.client.InMemoryTransport` (for testing)
 	Comma-separated URLs
 		→ :class:`MultiNodeTransport`
 
@@ -647,13 +627,6 @@ def create_transport(
 		urls = [u.strip() for u in url.split(",") if u.strip()]
 		return MultiNodeTransport(urls, **kwargs)
 
-	# memory:// → InMemoryTransport
-	if url.startswith("memory://"):
-		from .client import InMemoryTransport
-
-		return InMemoryTransport()
-
-	# http(s):// → HTTPTransport
 	if url.startswith("http://") or url.startswith("https://"):
 		return HTTPTransport(url, **{k: v for k, v in kwargs.items() if k == "request_timeout"})
 
@@ -661,7 +634,4 @@ def create_transport(
 	if url.startswith("ws://") or url.startswith("wss://"):
 		return WebSocketTransport(url, **kwargs)
 
-	raise ValueError(
-		f"Unknown URL scheme in {url!r}. "
-		"Supported: ws://, wss://, http://, https://, memory://"
-	)
+	raise ValueError(f"Unknown URL scheme in {url!r}. Supported: ws://, wss://, http://, https://, memory://")

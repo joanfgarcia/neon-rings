@@ -6,7 +6,7 @@ A lightweight WebSocket router client for the Red-Pill ecosystem.
 
 import asyncio
 import logging
-from collections.abc import Callable
+from collections.abc import Awaitable, Callable
 from typing import Any, Protocol
 
 from .crypto import KeyPair
@@ -34,7 +34,7 @@ class RingsClient:
 			self._transport = transport
 
 		self._node_id: str | None = None
-		self._on_message_callback: Callable[[str, Any], None] | None = None
+		self._on_message_callback: Callable[[str, Any], None | Awaitable[None]] | None = None
 		self._listen_task: asyncio.Task | None = None
 
 	@classmethod
@@ -61,7 +61,7 @@ class RingsClient:
 	async def __aexit__(self, exc_type, exc_val, exc_tb):
 		await self.disconnect()
 
-	def set_message_handler(self, callback: Callable[[str, Any], None]):
+	def set_message_handler(self, callback: Callable[[str, Any], None | Awaitable[None]]):
 		"""Set a callback for incoming messages."""
 		self._on_message_callback = callback
 

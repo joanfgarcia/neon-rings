@@ -83,6 +83,7 @@ class RingsServer:
 			result = await handler(params, websocket)
 			if result is not None:
 				return {"jsonrpc": "2.0", "result": result, "id": req_id}
+			return None
 		except Exception as e:
 			logger.error(f"RPC Handler Error ({method}): {e}")
 			return {"jsonrpc": "2.0", "error": {"code": -32000, "message": str(e)}, "id": req_id}
