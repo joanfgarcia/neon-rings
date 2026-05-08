@@ -1,0 +1,41 @@
+[project]
+name = "neon-rings"
+version = "0.1.0-alpha"
+description = "A lightweight P2P transport layer adapted for the Red-Pill ecosystem"
+readme = "README.md"
+requires-python = ">=3.11"
+authors = [
+    { name = "Joan F. Garcia", email = "joan@example.com" }
+]
+dependencies = [
+    "websockets>=12.0",
+    "cryptography>=41.0.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project.scripts]
+neon-rings-server = "neon_rings.server:main"
+neon-rings-client = "neon_rings.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/neon_rings"]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.23.0",
+    "pytest-cov>=4.1.0",
+    "ruff>=0.3.0",
+    "aiohttp>=3.9.0",
+]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
