@@ -1,6 +1,6 @@
 [project]
 name = "neon-rings"
-version = "0.1.0-alpha"
+version = "0.1.0"
 description = "A lightweight P2P transport layer adapted for the Red-Pill ecosystem"
 readme = "README.md"
 requires-python = ">=3.11"
